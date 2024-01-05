@@ -3,6 +3,7 @@ import 'package:dart_rss/domain/rss_content.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:html/parser.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -169,6 +170,14 @@ class FeedInfo extends StatelessWidget {
   });
   final Job job;
 
+  Future<void> _copyToClipboard(BuildContext context, String link) {
+    return Clipboard.setData(ClipboardData(text: link)).then<void>(
+      (_) {
+        showSnackBar(context, message: 'Link copied to clipboard');
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -220,11 +229,21 @@ class FeedInfo extends StatelessWidget {
             Text(job.budget),
             const SizedBox(height: 10),
             Text(job.description),
-            TextButton(
-              onPressed: () async {
-                await launchUrl(Uri.parse(job.link));
+            InkWell(
+              onTap: () async {
+                await launchUrl(
+                  Uri.parse(job.link),
+                  mode: LaunchMode.externalApplication,
+                );
               },
-              child: const Text('View on Upwork'),
+              onLongPress: () => _copyToClipboard(context, job.link),
+              child: const Padding(
+                padding: EdgeInsets.all(8),
+                child: Text(
+                  'View on Upwork',
+                  textAlign: TextAlign.center,
+                ),
+              ),
             ),
           ],
         ),
@@ -433,4 +452,22 @@ extension on RssContent {
 class MyCustomMessages extends timeago.EnMessages {
   @override
   String aboutAnHour(int minutes) => '1 hour ${minutes % 60} minutes';
+}
+
+void showSnackBar(BuildContext context, {required String message}) {
+  final snackbar = SnackBar(
+    content: Text(message),
+    duration: const Duration(seconds: 3),
+    behavior: SnackBarBehavior.floating,
+
+    margin: const EdgeInsets.only(
+      left: 12,
+      right: 12,
+      bottom: 12,
+    ),
+    // width: 200,
+  );
+  ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(snackbar);
 }

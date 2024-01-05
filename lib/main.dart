@@ -150,7 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           itemCount: posts.length,
                           itemBuilder: (context, index) {
                             final job = posts.elementAt(index);
-                            return FeedInfo(job: job);
+                            return FeedInfoCard(job: job);
                           },
                         ),
                       ),
@@ -163,8 +163,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class FeedInfo extends StatelessWidget {
-  const FeedInfo({
+class FeedInfoCard extends StatelessWidget {
+  const FeedInfoCard({
     required this.job,
     super.key,
   });
@@ -194,41 +194,65 @@ class FeedInfo extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  flex: 2,
                   child: Text(
-                    job.title,
-                    textAlign: TextAlign.start,
-                    overflow: TextOverflow.ellipsis,
+                    timeago.format(job.publishedAt),
                   ),
                 ),
                 Expanded(
                   child: Text(
-                    timeago.format(job.publishedAt),
+                    'Pay: ${job.budget}',
                     textAlign: TextAlign.end,
                   ),
                 ),
               ],
             ),
-            const SizedBox(width: 10),
-            Text(job.country),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Chip(
-                label: Text(job.category),
-              ),
-            ),
             const SizedBox(height: 10),
-            Wrap(
-              spacing: 5,
-              runSpacing: 3,
+            Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                for (final skill in job.skills) Chip(label: Text(skill)),
+                const Icon(Icons.location_on_outlined),
+                const SizedBox(width: 5),
+                Text(job.country),
               ],
             ),
             const SizedBox(height: 10),
-            Text(job.budget),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text.rich(
+                TextSpan(
+                  text: 'Category: ',
+                  children: [
+                    TextSpan(
+                      text: job.category,
+                    ),
+                  ],
+                ),
+              ),
+            ),
             const SizedBox(height: 10),
-            Text(job.description),
+            Text(
+              job.title,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 10),
+            Flexible(
+              child: Text(
+                job.description,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
+            const SizedBox(height: 10),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  for (final skill in job.skills) ...[
+                    Chip(label: Text(skill)),
+                    const SizedBox(width: 4),
+                  ],
+                ],
+              ),
+            ),
             InkWell(
               onTap: () async {
                 await launchUrl(
@@ -237,11 +261,14 @@ class FeedInfo extends StatelessWidget {
                 );
               },
               onLongPress: () => _copyToClipboard(context, job.link),
-              child: const Padding(
-                padding: EdgeInsets.all(8),
+              child: Padding(
+                padding: const EdgeInsets.all(8),
                 child: Text(
                   'View on Upwork',
-                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                        color: Theme.of(context).primaryColor,
+                      ),
+                  // textAlign: TextAlign.center,
                 ),
               ),
             ),
@@ -336,7 +363,7 @@ extension RemoveHtmlTagsX on String {
   }
 
   String getBudget() {
-    return extractHourlyPay() ?? extractFixedPrice() ?? 'No budget';
+    return extractHourlyPay() ?? extractFixedPrice() ?? 'Unavailable';
   }
 
   String? extractHourlyPay() {

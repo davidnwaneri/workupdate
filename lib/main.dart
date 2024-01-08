@@ -6,11 +6,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:html/parser.dart';
 import 'package:intl/intl.dart';
+import 'package:talker_dio_logger/talker_dio_logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:workupdate/feed_entity.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-final dio = Dio();
+final dio = Dio()
+  ..interceptors.add(
+    TalkerDioLogger(
+      settings: const TalkerDioLoggerSettings(
+        printRequestHeaders: true,
+      ),
+    ),
+  );
 
 Future<String> getXmlString() async {
   const pageIndex = 0;

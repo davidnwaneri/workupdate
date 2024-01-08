@@ -26,7 +26,7 @@ Future<String> getXmlString() async {
   const pageSize = 10;
 
   try {
-    final res = await dio.get(
+    final res = await dio.get<String>(
       const String.fromEnvironment('BASE_URL'),
       queryParameters: {
         'q': 'flutter',
@@ -38,7 +38,7 @@ Future<String> getXmlString() async {
         'orgUid': const String.fromEnvironment('ORG_UID'),
       },
     );
-    final xmlString = res.data as String;
+    final xmlString = res.data!;
     return xmlString;
   } catch (e) {
     rethrow;

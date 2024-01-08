@@ -9,6 +9,29 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  errors:
+    invalid_annotation_target: ignore
+    invalid_assignment: error
+    strict_raw_type: error
+    argument_type_not_assignable: error
+    inference_failure_on_collection_literal: error
+    inference_failure_on_function_invocation: error
+    always_declare_return_types: error
+    collection_methods_unrelated_type: error
+    unrelated_type_equality_checks: error
+    avoid_void_async: error
+    lines_longer_than_80_chars: ignore
+    must_be_immutable: error
+    void_checks: error
+    body_might_complete_normally: error
+    body_might_complete_normally_nullable: error
+
+  language:
+    strict-casts: true
+    strict-raw-types: true
+    strict-inference: true
+
 linter:
   # The lint rules applied to this project can be customized in the
   # section below to disable rules from the `package:flutter_lints/flutter.yaml`
@@ -21,8 +44,9 @@ linter:
   # `// ignore_for_file: name_of_lint` syntax on the line or in the file
   # producing the lint.
   rules:
-    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
-    # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
+    - prefer_single_quotes
+    - lines_longer_than_80_chars
+    - always_declare_return_types
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options

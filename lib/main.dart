@@ -2,6 +2,7 @@ import 'package:dart_rss/dart_rss.dart';
 import 'package:dart_rss/domain/rss_content.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:html/parser.dart';
@@ -44,6 +45,31 @@ Future<String> getXmlString() async {
   }
 }
 
+Future<FeedEntity> convertXmlToFeed() async {
+  try {
+    final xmlString = await getXmlString();
+    var rssFeed = RssFeed.parse(xmlString);
+
+    final feed = FeedEntity(
+      title: rssFeed.description!.removeHtmlTags(),
+      link: rssFeed.link!,
+      jobs: rssFeed.items.map((e) => Job(
+            title: e.title!.removeUpworkText().removeHtmlTags(),
+            description: e.description!.removeHtmlTags().extractDescription(),
+            link: e.link!,
+            country: e.description!.extractCountry(),
+            publishedAt: DateFormat('EEE, dd MMM yyyy HH:mm:ss Z').parseUTC(e.pubDate!).toLocal(),
+            category: e.description!.extractCategory().removeHtmlTags(),
+            budget: e.description!.getBudget(),
+            skills: e.description!.extractSkills(),
+          )),
+    );
+    return feed;
+  } catch (e) {
+    rethrow;
+  }
+}
+
 void main() {
   runApp(const WorkUpdateApp());
 }
@@ -73,7 +99,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late Future<FeedEntity> _rssFeedFuture;
+  late Future<void> _rssFeedFuture;
+  FeedEntity? _feed;
   String? _appBarTitle;
 
   @override
@@ -83,34 +110,31 @@ class _MyHomePageState extends State<MyHomePage> {
     _rssFeedFuture = getFeed();
   }
 
-  void _setAppBarTitle(String? text) {
-    if (text == null) return;
-    _appBarTitle = text;
-  }
-
-  Future<FeedEntity> getFeed() async {
+  Future<void> getFeed() async {
     try {
-      final xmlString = await getXmlString();
-      var rssFeed = RssFeed.parse(xmlString);
-
-      final feed = FeedEntity(
-        title: rssFeed.description!.removeHtmlTags(),
-        link: rssFeed.link!,
-        jobs: rssFeed.items.map((e) => Job(
-              title: e.title!.removeUpworkText().removeHtmlTags(),
-              description: e.description!.removeHtmlTags().extractDescription(),
-              link: e.link!,
-              country: e.description!.extractCountry(),
-              publishedAt: DateFormat('EEE, dd MMM yyyy HH:mm:ss Z').parseUTC(e.pubDate!).toLocal(),
-              category: e.description!.extractCategory(),
-              budget: e.description!.getBudget(),
-              skills: e.description!.extractSkills(),
-            )),
-      );
-      return feed;
+      final feed = await convertXmlToFeed();
+      _feed = feed;
     } catch (e) {
       rethrow;
+    } finally {
+      _setAppBarTitle(_feed?.title);
     }
+  }
+
+  Future<void> _refreshFeed() async {
+    try {
+      final feed = await convertXmlToFeed();
+      setState(() => _feed = feed);
+    } catch (e) {
+      if (mounted) showSnackBar(context, message: e.toString());
+    } finally {
+      _setAppBarTitle(_feed?.title);
+    }
+  }
+
+  void _setAppBarTitle(String? text) {
+    if (text == _appBarTitle) return;
+    setState(() => _appBarTitle = text);
   }
 
   @override
@@ -125,47 +149,72 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
-        child: FutureBuilder<FeedEntity>(
+        child: FutureBuilder<void>(
             future: _rssFeedFuture,
-            builder: (context, AsyncSnapshot<FeedEntity> snapshot) {
-              if (snapshot.hasError) {
-                return ErrorView(error: snapshot.error.toString());
+            builder: (context, AsyncSnapshot<void> snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.none:
+                case ConnectionState.waiting:
+                  return const LoadingView();
+                case ConnectionState.active:
+                case ConnectionState.done:
+                  final hasErrorAndNoInitialData = snapshot.hasError && _feed == null;
+                  final hasErrorAndInitialData = snapshot.hasError && _feed != null;
+
+                  if (hasErrorAndNoInitialData) return ErrorView(error: snapshot.error.toString());
+
+                  final feed = _feed!;
+                  final jobs = feed.jobs;
+
+                  if (hasErrorAndInitialData) {
+                    return JobListView(
+                      jobs: jobs,
+                      onRefresh: _refreshFeed,
+                    );
+                  } else {
+                    // At this point there is no error, and everything was successful, so just return the data
+                    return JobListView(
+                      jobs: jobs,
+                      onRefresh: _refreshFeed,
+                    );
+                  }
               }
-
-              if (snapshot.hasData == false) {
-                return const LoadingView();
-              }
-
-              final feed = snapshot.data!;
-              final posts = feed.jobs;
-
-              _setAppBarTitle(feed.title);
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  if (posts.isEmpty)
-                    const Text('Empty Post')
-                  else
-                    Expanded(
-                      child: RefreshIndicator.adaptive(
-                        onRefresh: () async {
-                          final feed = await getFeed();
-                          setState(() => _rssFeedFuture = Future.value(feed));
-                        },
-                        child: ListView.builder(
-                          itemCount: posts.length,
-                          itemBuilder: (context, index) {
-                            final job = posts.elementAt(index);
-                            return FeedInfoCard(job: job);
-                          },
-                        ),
-                      ),
-                    ),
-                ],
-              );
             }),
+      ),
+    );
+  }
+}
+
+class JobListView extends StatelessWidget {
+  const JobListView({
+    required this.jobs,
+    required this.onRefresh,
+    super.key,
+  });
+
+  final Iterable<Job> jobs;
+  final Future<void> Function() onRefresh;
+
+  @override
+  Widget build(BuildContext context) {
+    if (jobs.isEmpty) return const Center(child: Text('No jobs found'));
+
+    return RefreshIndicator.adaptive(
+      onRefresh: onRefresh,
+      child: ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(
+          dragDevices: {
+            PointerDeviceKind.touch,
+            PointerDeviceKind.mouse,
+          },
+        ),
+        child: ListView.builder(
+          itemCount: jobs.length,
+          itemBuilder: (context, index) {
+            final job = jobs.elementAt(index);
+            return FeedInfoCard(job: job);
+          },
+        ),
       ),
     );
   }
@@ -332,7 +381,7 @@ extension RemoveHtmlTagsX on String {
     if (match != null) {
       return match.group(1)!;
     } else {
-      return "Unknown location";
+      return 'Unknown location';
     }
   }
 

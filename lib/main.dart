@@ -93,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
               description: e.description!.removeHtmlTags().extractDescription(),
               link: e.link!,
               country: e.description!.extractCountry(),
-              publishedAt: DateFormat('EEE, dd MMM yyyy HH:mm:ss Z').parse(e.pubDate!),
+              publishedAt: DateFormat('EEE, dd MMM yyyy HH:mm:ss Z').parseUTC(e.pubDate!).toLocal(),
               category: e.description!.extractCategory(),
               budget: e.description!.getBudget(),
               skills: e.description!.extractSkills(),
@@ -479,6 +479,9 @@ extension on RssContent {
 class MyCustomMessages extends timeago.EnMessages {
   @override
   String aboutAnHour(int minutes) => '1 hour ${minutes % 60} minutes';
+
+  @override
+  String lessThanOneMinute(int seconds) => '$seconds seconds';
 }
 
 void showSnackBar(BuildContext context, {required String message}) {

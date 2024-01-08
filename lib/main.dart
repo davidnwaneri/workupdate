@@ -133,8 +133,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _setAppBarTitle(String? text) {
-    if (text == _appBarTitle) return;
-    setState(() => _appBarTitle = text);
+    if (text == null || text == _appBarTitle) return;
+    setState(() => _appBarTitle = text.formatAppBarTitle());
   }
 
   @override
@@ -443,6 +443,16 @@ extension RemoveHtmlTagsX on String {
     } else {
       return null;
     }
+  }
+
+  String formatAppBarTitle() {
+    final dateRegExp = RegExp(r'of\s*(.*?)\s*UTC');
+    final match = dateRegExp.firstMatch(this);
+    final dateFromTitle = match!.group(1)!;
+
+    final date = DateFormat('MMMM dd, yyyy HH:mm').parseUTC(dateFromTitle).toLocal();
+    final dateToLocal = DateFormat('MMMM dd, yyyy hh:mm a').format(date);
+    return 'Jobs as of $dateToLocal';
   }
 }
 

@@ -16,7 +16,8 @@ class FeedEntity {
 
   @override
   String toString() {
-    return '''${describeIdentity(this)}(
+    return '''
+    ${describeIdentity(this)}(
         title: $title,
         link: $link,
         jobs: $jobs,
@@ -48,7 +49,8 @@ class Job {
 
   @override
   String toString() {
-    return '''${describeIdentity(this)}(
+    return '''
+    ${describeIdentity(this)}(
         title: $title,
         description: $description,
         link: $link,

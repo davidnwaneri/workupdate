@@ -8,9 +8,9 @@ import 'package:flutter/services.dart';
 import 'package:html/parser.dart';
 import 'package:intl/intl.dart';
 import 'package:talker_dio_logger/talker_dio_logger.dart';
+import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:workupdate/feed_entity.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 final dio = Dio()
   ..interceptors.add(
@@ -48,21 +48,23 @@ Future<String> getXmlString() async {
 Future<FeedEntity> convertXmlToFeed() async {
   try {
     final xmlString = await getXmlString();
-    var rssFeed = RssFeed.parse(xmlString);
+    final rssFeed = RssFeed.parse(xmlString);
 
     final feed = FeedEntity(
       title: rssFeed.description!.removeHtmlTags(),
       link: rssFeed.link!,
-      jobs: rssFeed.items.map((e) => Job(
-            title: e.title!.removeUpworkText().removeHtmlTags(),
-            description: e.description!.removeHtmlTags().extractDescription(),
-            link: e.link!,
-            country: e.description!.extractCountry(),
-            publishedAt: DateFormat('EEE, dd MMM yyyy HH:mm:ss Z').parseUTC(e.pubDate!).toLocal(),
-            category: e.description!.extractCategory().removeHtmlTags(),
-            budget: e.description!.getBudget(),
-            skills: e.description!.extractSkills(),
-          )),
+      jobs: rssFeed.items.map(
+        (e) => Job(
+          title: e.title!.removeUpworkText().removeHtmlTags(),
+          description: e.description!.removeHtmlTags().extractDescription(),
+          link: e.link!,
+          country: e.description!.extractCountry(),
+          publishedAt: DateFormat('EEE, dd MMM yyyy HH:mm:ss Z').parseUTC(e.pubDate!).toLocal(),
+          category: e.description!.extractCategory().removeHtmlTags(),
+          budget: e.description!.getBudget(),
+          skills: e.description!.extractSkills(),
+        ),
+      ),
     );
     return feed;
   } catch (e) {
@@ -150,36 +152,37 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: FutureBuilder<void>(
-            future: _rssFeedFuture,
-            builder: (context, AsyncSnapshot<void> snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.none:
-                case ConnectionState.waiting:
-                  return const LoadingView();
-                case ConnectionState.active:
-                case ConnectionState.done:
-                  final hasErrorAndNoInitialData = snapshot.hasError && _feed == null;
-                  final hasErrorAndInitialData = snapshot.hasError && _feed != null;
+          future: _rssFeedFuture,
+          builder: (context, AsyncSnapshot<void> snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.none:
+              case ConnectionState.waiting:
+                return const LoadingView();
+              case ConnectionState.active:
+              case ConnectionState.done:
+                final hasErrorAndNoInitialData = snapshot.hasError && _feed == null;
+                final hasErrorAndInitialData = snapshot.hasError && _feed != null;
 
-                  if (hasErrorAndNoInitialData) return ErrorView(error: snapshot.error.toString());
+                if (hasErrorAndNoInitialData) return ErrorView(error: snapshot.error.toString());
 
-                  final feed = _feed!;
-                  final jobs = feed.jobs;
+                final feed = _feed!;
+                final jobs = feed.jobs;
 
-                  if (hasErrorAndInitialData) {
-                    return JobListView(
-                      jobs: jobs,
-                      onRefresh: _refreshFeed,
-                    );
-                  } else {
-                    // At this point there is no error, and everything was successful, so just return the data
-                    return JobListView(
-                      jobs: jobs,
-                      onRefresh: _refreshFeed,
-                    );
-                  }
-              }
-            }),
+                if (hasErrorAndInitialData) {
+                  return JobListView(
+                    jobs: jobs,
+                    onRefresh: _refreshFeed,
+                  );
+                } else {
+                  // At this point there is no error, and everything was successful, so just return the data
+                  return JobListView(
+                    jobs: jobs,
+                    onRefresh: _refreshFeed,
+                  );
+                }
+            }
+          },
+        ),
       ),
     );
   }
@@ -366,7 +369,7 @@ class ErrorView extends StatelessWidget {
 extension RemoveHtmlTagsX on String {
   String removeHtmlTags() {
     final document = parse(this);
-    final String parsedString = parse(document.body!.text).documentElement!.text;
+    final parsedString = parse(document.body!.text).documentElement!.text;
     return parsedString;
   }
 
@@ -375,7 +378,7 @@ extension RemoveHtmlTagsX on String {
   }
 
   String extractCountry() {
-    RegExp countryRegExp = RegExp(r'<b>Country</b>:\s*(.*?)\s*<br />');
+    final countryRegExp = RegExp(r'<b>Country</b>:\s*(.*?)\s*<br />');
     final match = countryRegExp.firstMatch(this);
 
     if (match != null) {
@@ -386,19 +389,19 @@ extension RemoveHtmlTagsX on String {
   }
 
   String extractCategory() {
-    RegExp categoryRegExp = RegExp(r'<b>Category</b>:\s*(.*?)\s*<br />');
+    final categoryRegExp = RegExp(r'<b>Category</b>:\s*(.*?)\s*<br />');
     final match = categoryRegExp.firstMatch(this);
 
     return match!.group(1)!;
   }
 
   List<String> extractSkills() {
-    RegExp skillsRegExp = RegExp(r'<b>Skills</b>:(.*?)<br />');
+    final skillsRegExp = RegExp('<b>Skills</b>:(.*?)<br />');
     final match = skillsRegExp.firstMatch(this);
 
     if (match != null) {
-      String skillsString = match.group(1)!;
-      List<String> skillsList = skillsString.split(',').map((e) => e.trim()).toList();
+      final skillsString = match.group(1)!;
+      final skillsList = skillsString.split(',').map((e) => e.trim()).toList();
       return skillsList;
     } else {
       return [];
@@ -424,7 +427,7 @@ extension RemoveHtmlTagsX on String {
   }
 
   String? extractHourlyPay() {
-    RegExp hourlyPayRegExp = RegExp(r'<b>Hourly Range</b>:\s*(.*?)\s*<br />');
+    final hourlyPayRegExp = RegExp(r'<b>Hourly Range</b>:\s*(.*?)\s*<br />');
     final match = hourlyPayRegExp.firstMatch(this);
 
     if (match != null) {
@@ -435,7 +438,7 @@ extension RemoveHtmlTagsX on String {
   }
 
   String? extractFixedPrice() {
-    RegExp fixedPriceRegExp = RegExp(r'<b>Budget</b>:\s*(.*?)\s*<br />');
+    final fixedPriceRegExp = RegExp(r'<b>Budget</b>:\s*(.*?)\s*<br />');
     final match = fixedPriceRegExp.firstMatch(this);
 
     if (match != null) {
@@ -458,7 +461,8 @@ extension RemoveHtmlTagsX on String {
 
 extension RssFeedToString on RssFeed {
   String string() {
-    return '''${describeIdentity(this)}(
+    return '''
+    ${describeIdentity(this)}(
       title: $title,
       author: $author,
       description: $description,

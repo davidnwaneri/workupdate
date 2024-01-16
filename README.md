@@ -14,9 +14,6 @@
 <p align="center">
 <img src="https://img.shields.io/badge/Android-informational?style=for-the-badge&logo=android&logoColor=34A853&color=03589c" alt="Android platform">
 <img src="https://img.shields.io/badge/iOS-informational?style=for-the-badge&logo=apple&logoColor=000000&color=03589c" alt="iOS platform">
-<img src="https://img.shields.io/badge/Windows-informational?style=for-the-badge&logo=windows&logoColor=0078D4&color=03589c" alt="Windows platform">
-<img src="https://img.shields.io/badge/MacOs-informational?style=for-the-badge&logo=apple&logoColor=000000&color=03589c" alt="MacOs platform">
-<img src="https://img.shields.io/badge/Linux-informational?style=for-the-badge&logo=linux&logoColor=FCC624&color=03589c" alt="Linux platform">
 </p>
 
 An application that notifies of latest job posting on upwork, almost immediately

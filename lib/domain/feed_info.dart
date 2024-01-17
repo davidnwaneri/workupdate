@@ -1,5 +1,7 @@
+import 'package:dart_rss/dart_rss.dart';
 import 'package:flutter/foundation.dart';
 import 'package:workupdate/domain/job_entry.dart';
+import 'package:workupdate/utils/extension_parsers.dart';
 
 @immutable
 class FeedInfo {
@@ -8,6 +10,14 @@ class FeedInfo {
     required this.link,
     required this.jobs,
   });
+
+  factory FeedInfo.fromRssFeed(RssFeed feed) {
+    return FeedInfo(
+      title: feed.description!.removeHtmlTags().formatAppBarTitle(),
+      link: feed.link!,
+      jobs: feed.items.map(JobEntry.fromRssItem),
+    );
+  }
 
   final String title;
 

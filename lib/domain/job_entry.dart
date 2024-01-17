@@ -1,33 +1,8 @@
 import 'package:flutter/foundation.dart';
 
 @immutable
-class FeedEntity {
-  const FeedEntity({
-    required this.title,
-    required this.link,
-    required this.jobs,
-  });
-
-  final String title;
-
-  /// The link to the search result on upwork.
-  final String link;
-  final Iterable<Job> jobs;
-
-  @override
-  String toString() {
-    return '''
-    ${describeIdentity(this)}(
-        title: $title,
-        link: $link,
-        jobs: $jobs,
-    )''';
-  }
-}
-
-@immutable
-class Job {
-  const Job({
+class JobEntry {
+  const JobEntry({
     required this.title,
     required this.description,
     required this.link,

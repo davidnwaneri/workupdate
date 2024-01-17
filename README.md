@@ -31,7 +31,11 @@ These compile-time variables are required through `--dart-define`
 
 ## License
 
-This project is licensed under the GNU General Public License v2 - see the [LICENSE](LICENSE) file for details
+This project is licensed under the GNU General Public License v2 - see the [LICENSE](LICENSE) file for details.
+
+The GNU General Public License v2 is an open source license. It means that you are free to modify and redistribute the
+source code under certain conditions. You can read more
+about [GNU General Public License v2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) on the GNU website.
 
 
 

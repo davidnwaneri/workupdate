@@ -22,9 +22,16 @@ An application that notifies of latest job posting on upwork, almost immediately
 
 These compile-time variables are required through `--dart-define`
 
+```
 - BASE_URL
 - SECURITY_TOKEN
 - USER_UID
 - ORG_UID
+```
+
+## License
+
+This project is licensed under the GNU General Public License v2 - see the [LICENSE](LICENSE) file for details
+
 
 

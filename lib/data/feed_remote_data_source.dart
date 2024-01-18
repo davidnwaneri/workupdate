@@ -32,10 +32,6 @@ class FeedRemoteDataSource {
           'q': 'flutter',
           'sort': 'recency',
           'paging': '$pageIndex;$pageSize',
-          'api_params': '1',
-          'securityToken': const String.fromEnvironment('SECURITY_TOKEN'),
-          'userUid': const String.fromEnvironment('USER_UID'),
-          'orgUid': const String.fromEnvironment('ORG_UID'),
         },
       );
       final xmlString = res.data as String;

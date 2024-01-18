@@ -24,9 +24,6 @@ These compile-time variables are required through `--dart-define`
 
 ```
 - BASE_URL
-- SECURITY_TOKEN
-- USER_UID
-- ORG_UID
 ```
 
 ## License

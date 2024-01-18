@@ -4,7 +4,7 @@ import 'package:workupdate/data/feed_remote_data_source.dart';
 import 'package:workupdate/domain/feed_info.dart';
 import 'package:workupdate/domain/job_entry.dart';
 import 'package:workupdate/presentation/state_handler/state_handler.dart';
-import 'package:workupdate/presentation/widgets/feed_info_card.dart';
+import 'package:workupdate/presentation/widgets/job_info_card.dart';
 import 'package:workupdate/utils/globals.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -130,7 +130,7 @@ class JobListView extends StatelessWidget {
           itemCount: jobs.length,
           itemBuilder: (context, index) {
             final job = jobs.elementAt(index);
-            return FeedInfoCard(job: job);
+            return JobInfoCard(job: job);
           },
         ),
       ),

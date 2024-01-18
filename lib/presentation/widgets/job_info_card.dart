@@ -4,8 +4,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:workupdate/domain/job_entry.dart';
 import 'package:workupdate/utils/globals.dart';
 
-class FeedInfoCard extends StatelessWidget {
-  const FeedInfoCard({
+class JobInfoCard extends StatelessWidget {
+  const JobInfoCard({
     required this.job,
     super.key,
   });

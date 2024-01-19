@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:workupdate/app/app_theme.dart';
 import 'package:workupdate/presentation/view/home_screen.dart';
 
 class WorkUpdateApp extends StatefulWidget {
@@ -33,10 +34,9 @@ class _WorkUpdateAppState extends State<WorkUpdateApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Workupdate',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      // TODO(me): Set theme mode based on user preference
       home: const HomeScreen(),
     );
   }

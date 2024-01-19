@@ -1,4 +1,9 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:workupdate/presentation/view/home_screen.dart';
 
@@ -13,6 +18,13 @@ class _WorkUpdateAppState extends State<WorkUpdateApp> {
   @override
   void initState() {
     super.initState();
+    _initializeConfigurations();
+  }
+
+  Future<void> _initializeConfigurations() async {
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    Intl.defaultLocale = PlatformDispatcher.instance.locale.toLanguageTag();
+    await initializeDateFormatting();
     timeago.setLocaleMessages('en', _MyCustomMessages());
   }
 

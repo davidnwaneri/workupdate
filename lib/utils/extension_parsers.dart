@@ -2,110 +2,50 @@ import 'package:dart_rss/dart_rss.dart';
 import 'package:dart_rss/domain/rss_content.dart';
 import 'package:flutter/foundation.dart';
 import 'package:html/parser.dart';
-import 'package:intl/intl.dart';
 
 extension RemoveHtmlTagsX on String {
+  /// Removes all HTML tags from a given string.
+  ///
+  /// This method parses the input string as an HTML document, then extracts and returns the text content.
+  /// Processes strings from RSS feed, where the HTML tags are not needed.
+  /// The method ensures that only readable text content is returned, making it suitable for display.
+  ///
+  /// For example, given the input:
+  /// ```
+  /// <![CDATA[Reports to<br />
+  /// Chief Information Officer (CIO), Chief Technology Officer (CTO)...<br /><br />
+  /// Job Brief<br />
+  /// We are looking for an experienced Developer to join our highly skilled technical team. <br /><br />
+  /// ...
+  /// ]]>
+  /// ```
+  /// The method will return:
+  /// ```
+  /// Reports to
+  /// Chief Information Officer (CIO)...
+  /// Job Brief
+  /// We are looking for an experienced Developer to join our highly skilled technical team.
+  /// ...
+  /// ```
   String removeHtmlTags() {
     final document = parse(this);
     final parsedString = parse(document.body!.text).documentElement!.text;
     return parsedString;
   }
-
-  String removeUpworkText() {
-    return replaceAll('- Upwork', '');
-  }
-
-  String extractCountry() {
-    final countryRegExp = RegExp(r'<b>Country</b>:\s*(.*?)\s*<br />');
-    final match = countryRegExp.firstMatch(this);
-
-    if (match != null) {
-      return match.group(1)!;
-    } else {
-      return 'Unknown location';
-    }
-  }
-
-  String extractCategory() {
-    final categoryRegExp = RegExp(r'<b>Category</b>:\s*(.*?)\s*<br />');
-    final match = categoryRegExp.firstMatch(this);
-
-    return match!.group(1)!;
-  }
-
-  List<String> extractSkills() {
-    final skillsRegExp = RegExp('<b>Skills</b>:(.*?)<br />');
-    final match = skillsRegExp.firstMatch(this);
-
-    if (match != null) {
-      final skillsString = match.group(1)!;
-      final skillsList = skillsString.split(',').map((e) => e.trim()).toList();
-      return skillsList;
-    } else {
-      return [];
-    }
-  }
-
-  String extractDescription() {
-    final firstBreak = indexOf('Budget:');
-    final secondBreak = indexOf('Hourly Range:');
-    final thirdBreak = indexOf('Posted On:');
-
-    if (firstBreak != -1) {
-      return substring(0, firstBreak);
-    } else if (secondBreak != -1) {
-      return substring(0, secondBreak);
-    } else {
-      return substring(0, thirdBreak);
-    }
-  }
-
-  String getBudget() {
-    return extractHourlyPay() ?? extractFixedPrice() ?? 'Unavailable';
-  }
-
-  String? extractHourlyPay() {
-    final hourlyPayRegExp = RegExp(r'<b>Hourly Range</b>:\s*(.*?)\s*<br />');
-    final match = hourlyPayRegExp.firstMatch(this);
-
-    if (match != null) {
-      return '${match.group(1)!}/hr';
-    } else {
-      return null;
-    }
-  }
-
-  String? extractFixedPrice() {
-    final fixedPriceRegExp = RegExp(r'<b>Budget</b>:\s*(.*?)\s*<br />');
-    final match = fixedPriceRegExp.firstMatch(this);
-
-    if (match != null) {
-      return match.group(1)!;
-    } else {
-      return null;
-    }
-  }
-
-  String formatAppBarTitle() {
-    final dateRegExp = RegExp(r'of\s*(.*?)\s*UTC');
-    final match = dateRegExp.firstMatch(this);
-    final dateFromTitle = match!.group(1)!;
-
-    final date = DateFormat('MMMM dd, yyyy HH:mm').parseUTC(dateFromTitle).toLocal();
-    final dateToLocal = DateFormat('MMMM dd, yyyy hh:mm a').format(date);
-    return 'Jobs as of $dateToLocal';
-  }
 }
 
 extension RssFeedToString on RssFeed {
-  String string() {
+  /// {@template string_identity}
+  /// A string representation of this object.
+  /// {@endtemplate}
+  String stringIdentity() {
     return '''
     ${describeIdentity(this)}(
       title: $title,
       author: $author,
       description: $description,
       link: $link,
-      items: ${items.map((e) => e.string()).toList()},
+      items: ${items.map((e) => e.stringIdentity()).toList()},
       image: $image,
       cloud: $cloud,
       categories: $categories,
@@ -129,19 +69,20 @@ extension RssFeedToString on RssFeed {
 }
 
 extension on RssItem {
-  String string() {
+  /// {@macro string_identity}
+  String stringIdentity() {
     return '''
     ${describeIdentity(this)}(
       title: $title,
       description: $description,
       link: $link,
-      categories: ${categories.map((e) => e.string()).toList()},
+      categories: ${categories.map((e) => e.stringIdentity()).toList()},
       guid: $guid,
       pubDate: $pubDate,
       author: $author,
       comments: $comments,
-      source: ${source?.string()},
-      content: ${content?.string()},
+      source: ${source?.stringIdentity()},
+      content: ${content?.stringIdentity()},
       media: $media,
       enclosure: $enclosure,
       dc: $dc,
@@ -153,7 +94,8 @@ extension on RssItem {
 }
 
 extension on RssCategory {
-  String string() {
+  /// {@macro string_identity}
+  String stringIdentity() {
     return '''
     ${describeIdentity(this)}(
       domain: $domain,
@@ -164,7 +106,8 @@ extension on RssCategory {
 }
 
 extension on RssSource {
-  String string() {
+  /// {@macro string_identity}
+  String stringIdentity() {
     return '''
     ${describeIdentity(this)}(
       url: $url,
@@ -175,7 +118,8 @@ extension on RssSource {
 }
 
 extension on RssContent {
-  String string() {
+  /// {@macro string_identity}
+  String stringIdentity() {
     return '''
     ${describeIdentity(this)}(
       value: $value,

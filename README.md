@@ -34,5 +34,9 @@ The GNU General Public License v2 is an open source license. It means that you a
 source code under certain conditions. You can read more
 about [GNU General Public License v2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) on the GNU website.
 
+&nbsp;
+
+> [!CAUTION]
+> This project is still under development.
 
 

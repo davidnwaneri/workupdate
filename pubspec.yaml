@@ -41,7 +41,7 @@ dependencies:
   meta: ^1.10.0
   talker_dio_logger: ^4.3.2
   timeago: ^3.6.0
-  url_launcher: ^6.2.5
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:

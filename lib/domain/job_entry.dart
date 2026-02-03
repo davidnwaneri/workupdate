@@ -1,4 +1,4 @@
-import 'package:dart_rss/dart_rss.dart';
+import 'package:rss_dart/dart_rss.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:workupdate/utils/extension_parsers.dart';
@@ -30,7 +30,9 @@ class JobEntry {
       description: item.description!.removeHtmlTags().extractJobDescription(),
       link: item.link!,
       country: item.description!.extractCountry(),
-      publishedAt: DateFormat('EEE, dd MMM yyyy HH:mm:ss Z').parseUTC(item.pubDate!).toLocal(),
+      publishedAt: DateFormat(
+        'EEE, dd MMM yyyy HH:mm:ss Z',
+      ).parseUTC(item.pubDate!).toLocal(),
       category: item.description!.extractCategory().removeHtmlTags(),
       budget: item.description!.getBudget(),
       skills: item.description!.extractSkills(),

@@ -1,4 +1,4 @@
-import 'package:dart_rss/dart_rss.dart';
+import 'package:rss_dart/dart_rss.dart';
 import 'package:workupdate/data/network_client.dart';
 import 'package:workupdate/data/network_client_exception.dart';
 import 'package:workupdate/domain/feed_info.dart';

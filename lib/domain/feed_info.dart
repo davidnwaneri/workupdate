@@ -1,4 +1,4 @@
-import 'package:dart_rss/dart_rss.dart';
+import 'package:rss_dart/dart_rss.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:workupdate/domain/job_entry.dart';
@@ -61,7 +61,9 @@ extension on String {
     final match = dateRegExp.firstMatch(this);
     final dateFromTitle = match!.group(1)!;
 
-    final date = DateFormat('MMMM dd, yyyy HH:mm').parseUTC(dateFromTitle).toLocal();
+    final date = DateFormat(
+      'MMMM dd, yyyy HH:mm',
+    ).parseUTC(dateFromTitle).toLocal();
     final dateToLocal = DateFormat('MMMM dd, yyyy hh:mm a').format(date);
     return 'Jobs as of $dateToLocal';
   }

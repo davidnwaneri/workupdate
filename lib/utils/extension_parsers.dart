@@ -1,7 +1,7 @@
-import 'package:dart_rss/dart_rss.dart';
-import 'package:dart_rss/domain/rss_content.dart';
 import 'package:flutter/foundation.dart';
 import 'package:html/parser.dart';
+import 'package:rss_dart/dart_rss.dart';
+import 'package:rss_dart/domain/rss_content.dart';
 
 extension RemoveHtmlTagsX on String {
   /// Removes all HTML tags from a given string.
@@ -62,7 +62,7 @@ extension RssFeedToString on RssFeed {
       dc: $dc,
       itunes: $itunes,
       podcastIndex: $podcastIndex,
-      
+
     )
     ''';
   }
